@@ -28,6 +28,41 @@ x <- read_csv("~/data/census/censoc_dmf_v2/censoc_dmf_v2.csv",
                                     weight_conservative = col_double()))
 ```
 
+create a 1% sample of this data, called "small"
+make bar plot of dmonth
+```{r 1% data}
+small <- x %>%
+  slice_sample(prop = 0.01)
+```
 
+```{r plotting data}
+small %>%
+  ggplot(aes(x = dmonth)) +
+  geom_bar()
+```
+```{r mortality in jan over time}
+small %>%
+  group_by(dmonth,dyear) %>%
+  filter(dmonth == c(1,7)) %>%
+  summarize(deaths = n()) %>%
+  pivot_wider(names_from = dmonth,
+              names_prefix = "month",
+              values_from = deaths) %>%
+  mutate(death_ratio = month1/month7) 
+  
+```
+```{r}
+small %>%
+  ggplot(aes(dyear, death_ratio)) +
+  geom_point() +
+  geom_smooth(method = "lm",
+              formula = y ~ x) +
+  labs(title = "Mortality Over Time",
+       subtitle = "Why are Januaries becoming more dangerous?",
+       x = "Year of Death",
+       y = "Ratio of January to July Deaths",
+       caption = "Source: CenSoc")
+       
+```
 
 
